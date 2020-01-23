@@ -19,10 +19,18 @@ Amazon Simple Workflow Service Demo Application in python with boto3
 Go to config.py and add your infos
 
 ```
-DOMAIN = 'your_domain'
-AWS_ACCESS_KEY_ID = 'your_access_key_id'
+WORKFLOW = "upload-to-s3-bucket"
+WORKFLOW_VERSION = "0.2"
+TASK_LIST_NAME = "swf-task-list"
 
-AWS_SECRET_ACCESS_KEY = 'your_secret_access_key'
+ACTIVITY_LIST = [
+    {'name': 'copyCSVToBucket', 'version': '0.2'},
+    {'name': 'listBuckets', 'version': '0.2'},
+]
+
+DOMAIN = 'upload-file-S3-v2'
+AWS_SECRET_ACCESS_KEY = ''
+AWS_ACCESS_KEY_ID = ''
 ```
 
 Register the workflow
@@ -40,7 +48,7 @@ python decider.py
 Run the worker, he uses 3 arguments (string)
 
 ```python
-python worker.py file_to_upload_to_s3 new_name_to_s3 name_downloaded_file
+python worker.py target_bucket key_name_of_file_bucket_source source_bucket
 ```
 
 start the workflow execution
