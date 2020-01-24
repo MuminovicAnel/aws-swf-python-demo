@@ -40,7 +40,7 @@ while True:
             print('Dispatching task to worker', newTask['workflowExecution'], newTask['workflowType'])
             # make a decision that schedules the first activity task
             activity_type = SWFConfig.ACTIVITY_LIST[0]
-            input_param = lastEvent['workflowExecutionStartedEventAttributes']['input']
+            input_param = str(lastEvent['workflowExecutionStartedEventAttributes'])
             swf.respond_decision_task_completed(
                 taskToken=newTask['taskToken'],
                 decisions=[
@@ -48,8 +48,8 @@ while True:
                         'decisionType': 'ScheduleActivityTask',
                         'scheduleActivityTaskDecisionAttributes': {
                             'activityType': {
-                                'name': activity_type,
-                                'version': SWFConfig.WORKFLOW_VERSION
+                                'name': activity_type['name'],
+                                'version': activity_type['version']
                             },
                             'activityId': 'activityid-' + str(uuid.uuid4()),
                             'input': input_param,
@@ -94,7 +94,7 @@ while True:
 
             # search the index for current activity type
             for i, activity_type in enumerate(SWFConfig.ACTIVITY_LIST):
-                if activity_type == activity_type_name:
+                if activity_type['name'] == activity_type_name:
                     current_index = i
                     break
 

@@ -10,7 +10,7 @@ try:
 		domain = SWFConfig.DOMAIN,
 		name = SWFConfig.WORKFLOW,
 		version = SWFConfig.WORKFLOW_VERSION,
-		description = 'Pour tester la création de workflow depuis python',
+		description = 'Copie users.csv sur son bucket S3',
 		defaultTaskStartToCloseTimeout=str(3600),
 		defaultExecutionStartToCloseTimeout=str(24*3600),
 		defaultChildPolicy = "TERMINATE",
@@ -27,9 +27,9 @@ try:
 	for activity_type in SWFConfig.ACTIVITY_LIST:
 		swf.register_activity_type(
 			domain=SWFConfig.DOMAIN,
-			name=activity_type,
+			name=activity_type['name'],
 			version=SWFConfig.WORKFLOW_VERSION,
-			description=f"Activity type {activity_type}",
+			description=f"Activity type {activity_type['version']}",
 			defaultTaskHeartbeatTimeout="900",
 			defaultTaskScheduleToStartTimeout="120",
 			defaultTaskScheduleToCloseTimeout="3800",

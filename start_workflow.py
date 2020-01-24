@@ -5,7 +5,7 @@ from config import SWFConfig
 swf = boto3.client('swf')
     
 start_workflow = swf.start_workflow_execution(
-	Sdomain=SWFConfig.DOMAIN,
+	domain=SWFConfig.DOMAIN,
 	workflowId=f'test-{uuid.uuid4()}',
 	workflowType={
 		"name": SWFConfig.WORKFLOW,# string
