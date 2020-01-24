@@ -6,22 +6,20 @@ from botocore.client import Config
 from botocore.exceptions import NoCredentialsError
 from config import SWFConfig
 import sys
-import os
-
-bucket = 'muminovic.actualit.info'
 
 botoConfig = Config(connect_timeout=50, read_timeout=70)
 swf = boto3.client('swf', config=botoConfig)
 s3 = boto3.resource(
     's3',
     # Hard coded strings as credentials, not recommended.
-    aws_access_key_id=SWFConfig.AWS_ACCESS_KEY_ID,
-    aws_secret_access_key=SWFConfig.AWS_SECRET_ACCESS_KEY
+    #aws_access_key_id=SWFConfig.AWS_ACCESS_KEY_ID,
+    #aws_secret_access_key=SWFConfig.AWS_SECRET_ACCESS_KEY,
+    #region_name=SWFConfig.REGION_NAME
 )
         
-def uploadToS3(file, bucket, name):
+def uploadToS3FromLocal(file, bucket, name):
     try:
-        s3.meta.client.upload_file(file, bucket, name)
+        return s3.meta.client.upload_file(file, bucket, name)
         print("Upload Successful")
         return True
     except FileNotFoundError:
@@ -32,11 +30,20 @@ def uploadToS3(file, bucket, name):
         return False
     
 def listObjects(bucketName):
-    return s3.meta.client.list_objects_v2(Bucket=bucketName)
-
-def downloadFile(bucket, filename, localName):
     try:
-        s3.meta.client.download_file(bucket, filename, localName)
+        return s3.meta.client.list_objects_v2(Bucket=bucketName)
+        print("Successfuly listed buckets")
+        return True
+    except Exception as e:
+        print('Error in listing buckets: ', e.response.get('Error', {}).get('Code'))
+        return False
+    except NoCredentialsError:
+        print("Credentials not available")
+        return False
+
+def downloadFileFromS3(bucket, filename, localName):
+    try:
+        return s3.meta.client.download_file(bucket, filename, localName)
         print("Successfuly downloaded")
         return True
     except FileNotFoundError:
@@ -45,16 +52,13 @@ def downloadFile(bucket, filename, localName):
     except NoCredentialsError:
         print("Credentials not available")
         return False
-    
-#hello = lambda x: print(x)
-#captializeFirstLetter = lambda message: print(message.capitalize())
 
 print('Listening for Worker Tasks')
 
 activities = {
-    "uploadCSVToS3Bucket": uploadToS3(sys.argv[1], bucket, sys.argv[2]),
-    'listBuckets' : listObjects(bucket),
-    'downloadFile': downloadFile(bucket, sys.argv[2], sys.argv[3])
+    "uploadToS3": "copyToBucket",
+    "listBuckets" : "listObjects",
+    "downloadFileFromS3": 'downloadFileFromS3'
 }
 
 
@@ -79,14 +83,20 @@ while True:
         input_param = task['input']
 
         if activity_type_name in activities:
+
+            upload = uploadToS3FromLocal(sys.argv[2], sys.argv[1], sys.argv[3]) 
+            print(upload)          
             
-            upload = uploadToS3(sys.argv[1], bucket, sys.argv[2])           
-            print(upload)
+            buckets = listObjects(sys.argv[1])
+            for bucket in buckets['Contents']:
+                print(bucket)
             
-            buckets = listObjects(bucket)
-            print(buckets)
+            download = downloadFileFromS3(sys.argv[1], sys.argv[3], sys.argv[4])
+            print(download)
             
-            download = downloadFile(bucket, sys.argv[2], sys.argv[3])
+            """ copy_source = {'Bucket': sys.argv[1], 'Key': sys.argv[2]}
+            copy = copyFromSourceToTargetBucket(copy_source, sys.argv[3], sys.argv[4])           
+            print(copy) """
 
             swf.respond_activity_task_completed(
                 taskToken=task['taskToken'],
@@ -94,5 +104,7 @@ while True:
             )
 
             print('Task Done', activities)
+
+            exit()
         else:
             print(f'Activity type {activity_type_name} not found!')
