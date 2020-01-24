@@ -20,12 +20,13 @@ Go to config.py and add your infos
 
 ```
 WORKFLOW = "upload-to-s3-bucket"
-WORKFLOW_VERSION = "0.2"
+WORKFLOW_VERSION = "0.3"
 TASK_LIST_NAME = "swf-task-list"
 
 ACTIVITY_LIST = [
-    {'name': 'copyCSVToBucket', 'version': '0.2'},
-    {'name': 'listBuckets', 'version': '0.2'},
+    {'name': 'uploadToS3', 'version': '0.3'},
+	{'name': 'listBuckets', 'version': '0.3'},
+	{'name': 'downloadFileFromS3', 'version': '0.3'},
 ]
 
 DOMAIN = 'upload-file-S3-v2'
@@ -48,7 +49,7 @@ python decider.py
 Run the worker, he uses 3 arguments (string)
 
 ```python
-python worker.py target_bucket key_name_of_file_bucket_source source_bucket
+python worker.py target_bucket filename filename_key path_downloaded_file
 ```
 
 start the workflow execution
