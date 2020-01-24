@@ -16,6 +16,28 @@ Amazon Simple Workflow Service Demo Application in python with boto3
 
 #### How it works
 
+Create a folder in your C:/users/your_username/ named .aws with 2 files
+
+```
+config
+credentials
+```
+
+In config, put these infos
+
+```
+[default]
+region = your_region
+```
+
+In credentials, put these infos
+
+```
+[default]
+aws_access_key_id = your_access_key_id
+aws_secret_access_key = your_secret_access_key
+```
+
 Go to config.py and add your infos
 
 ```
@@ -30,8 +52,6 @@ ACTIVITY_LIST = [
 ]
 
 DOMAIN = 'upload-file-S3-v2'
-AWS_SECRET_ACCESS_KEY = ''
-AWS_ACCESS_KEY_ID = ''
 ```
 
 Register the workflow
