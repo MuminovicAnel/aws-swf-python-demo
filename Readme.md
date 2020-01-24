@@ -57,7 +57,7 @@ DOMAIN = 'upload-file-S3-v2'
 Register the workflow
 
 ```python
-python register.py
+python register_workflow.py
 ```
 
 Run the decider
